@@ -126,3 +126,137 @@ class Solution {
         recursion(arr, (left+right)/2+1, right);
     }
 };
+
+code8//
+class Solution {
+    public int[] beautifulArray(int n) {
+        int[] ans = new int[n];
+        for(int i = 0; i  < n; i++){
+            ans[i] = i+1;
+        }
+        recursion(ans, 0, n-1);
+        return ans;
+    }
+    public void recursion(int[] arr, int left, int right){
+        if(left >= right)
+            return;
+        ArrayList<Integer> l = new ArrayList<>();
+        ArrayList<Integer> r = new ArrayList<>();
+        boolean alt = true;						
+        for(int i = left; i <= right; i++){ 
+            if(alt)
+                l.add(arr[i]);
+            else
+                r.add(arr[i]);
+            alt = !alt;
+        }
+        for(int i = left; i <= right; i++){ 
+            if(!l.isEmpty())
+                arr[i] = l.remove(0);
+            else
+                arr[i] = r.remove(0);
+        }
+        recursion(arr, left, (right+left)/2);
+        recursion(arr, (left+right)/2+1, right);
+    }
+}
+
+code9//
+class Solution {
+public:
+    vector<vector<int>> getSkyline(vector<vector<int>>& buildings) {
+        vector<pair<int, int>> events;
+        for (auto& building : buildings) {
+            events.push_back({building[0], building[2]});
+            events.push_back({building[1], -building[2]});
+        }
+
+        sort(events.begin(), events.end(), [](const pair<int, int>& a, const pair<int, int>& b) {
+            if (a.first != b.first) return a.first < b.first;
+            return a.second > b.second;
+        });
+
+        vector<vector<int>> result;
+        priority_queue<int> maxHeap;
+        maxHeap.push(0);
+
+        unordered_map<int, int> removed;
+
+        int prevHeight = 0;
+        
+        for (auto& event : events) {
+            int x = event.first;
+            int height = event.second;
+
+            if (height > 0) {
+                maxHeap.push(height);
+            } else {
+                removed[-height]++;
+            }
+
+            while (!maxHeap.empty() && removed[maxHeap.top()] > 0) {
+                removed[maxHeap.top()]--;
+                maxHeap.pop();
+            }
+
+            int currHeight = maxHeap.top();
+            if (currHeight != prevHeight) {
+                result.push_back({x, currHeight});
+                prevHeight = currHeight;
+            }
+        }
+
+        return result;
+    }
+};
+
+
+code10//
+class Solution {
+public:
+    int reversePairs(vector<int>& nums) {
+        vector<int> temp(nums.size());
+        return mergeSort(nums, temp, 0, nums.size() - 1);
+    }
+
+private:
+    int mergeSort(vector<int>& nums, vector<int>& temp, int left, int right) {
+        if (left >= right) return 0;
+
+        int mid = left + (right - left) / 2;
+        int count = mergeSort(nums, temp, left, mid) + mergeSort(nums, temp, mid + 1, right);
+        int j = mid + 1;
+        for (int i = left; i <= mid; ++i) {
+            while (j <= right && nums[i] > 2 * (long long)nums[j]) {
+                ++j;
+            }
+            count += (j - (mid + 1));
+        }
+
+        merge(nums, temp, left, mid, right);
+
+        return count;
+    }
+
+    void merge(vector<int>& nums, vector<int>& temp, int left, int mid, int right) {
+        for (int i = left; i <= right; ++i) {
+            temp[i] = nums[i];
+        }
+
+        int i = left, j = mid + 1, k = left;
+        while (i <= mid && j <= right) {
+            if (temp[i] <= temp[j]) {
+                nums[k++] = temp[i++];
+            } else {
+                nums[k++] = temp[j++];
+            }
+        }
+
+        while (i <= mid) {
+            nums[k++] = temp[i++];
+        }
+        while (j <= right) {
+            nums[k++] = temp[j++];
+        }
+    }
+};
